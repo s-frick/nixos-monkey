@@ -87,5 +87,14 @@
     wofi
     waybar
     hyprpaper
-  ]; system.stateVersion = "25.05"; 
+    brave
+    adwaita-icon-theme
+    gnome-themes-extra    # enthält Adwaita-Dark und HighContrast
+  ]; 
+    # systemweit dunkles GTK-Schema
+  environment.variables = {
+    GTK_THEME = "Adwaita:dark";   # oder "Catppuccin-Mocha-Standard-Blue-Dark" falls installiert
+  };
+
+  system.stateVersion = "25.05"; 
 }

@@ -5,8 +5,27 @@
 #    enable = true;
 #    xwayland.enable = true;
 #  };
+
+
   programs.hyprland.enable = true; 
   programs.hyprland.xwayland.enable = true; 
+
+
+  services.displayManager = {
+    sddm.enable = true;
+    sddm.wayland.enable = true;
+    defaultSession = "hyprland";
+    sddm.theme = "chili";          # Verzeichnisname des Themes
+  };
+
+  environment.systemPackages = with pkgs; [
+    sddm-chili-theme               # ← richtiges Paket in 25.05
+    bibata-cursors
+  ];
+
+  # (Optional) Cursor im Greeter
+  services.displayManager.sddm.settings.Theme.CursorTheme = "Bibata-Modern-Ice";
+
   home-manager.backupFileExtension = "hm-bak";
   home-manager.users.sebi = { pkgs, ... }: {
 
