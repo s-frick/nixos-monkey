@@ -8,16 +8,21 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager }
-  @inputs: {
-    nixosConfigurations.fuji = nixpkgs.lib.nixosSystem {
+  outputs = { self, nixpkgs, home-manager }@inputs: 
+    let
       system = "x86_64-linux";
-      specialArgs = { inherit inputs; };
-      modules = [
-        ./configuration.nix
-	#./hyprland.nix
-      ];
-    };
+      pkgs = nixpkgs.legacyPackages.${system};
+    in
+    {
+      nixosConfigurations.fuji = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./configuration.nix
+	  inputs.home-manager.nixosModules.default
+	  ./hyprland.nix
 
-  };
+        ];
+      };
+    };
 }

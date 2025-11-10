@@ -66,14 +66,14 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-    lazygit
     git
+    lazygit
     tmux
     vim 
     wget
     kitty
-  ];
-
-  system.stateVersion = "25.05"; 
-
+    wofi
+    waybar
+    hyprpaper
+  ]; system.stateVersion = "25.05"; 
 }

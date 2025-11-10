@@ -7,7 +7,10 @@
 #  };
   programs.hyprland.enable = true; 
   programs.hyprland.xwayland.enable = true; 
-  environment.etc."xdg/config/hypr/hyprland.conf".text = ''
+  home-manager.backupFileExtension = "hm-bak";
+  home-manager.users.sebi = { pkgs, ... }: {
+
+    xdg.configFile."hypr/hyprland.conf".text = ''
     monitor=,preferred,auto,auto
     
     # Set programs that you use
@@ -26,6 +29,7 @@
     # exec-once = $terminal
     # exec-once = nm-applet &
     # exec-once = waybar & hyprpaper & firefox
+    exec-once = waybar & hyprpaper & $terminal &
     
     env = XCURSOR_SIZE,24
     env = HYPRCURSOR_SIZE,24
@@ -257,5 +261,7 @@
     
     # Fix some dragging issues with XWayland
     windowrule = nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
-  '';
+    '';
+    home.stateVersion = "25.05"; 
+  };
 }
