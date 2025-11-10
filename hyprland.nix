@@ -30,16 +30,17 @@
     # exec-once = nm-applet &
     # exec-once = waybar & hyprpaper & firefox
     exec-once = waybar & hyprpaper & $terminal &
+    # exec-once = hyprpaper & $terminal &
     
     env = XCURSOR_SIZE,24
     env = HYPRCURSOR_SIZE,24
     
     # https://wiki.hyprland.org/Configuring/Variables/#general
     general {
-        gaps_in = 5
-        gaps_out = 20
+        gaps_in = 4
+        gaps_out = 12
     
-        border_size = 2
+        border_size = 1
     
         # https://wiki.hyprland.org/Configuring/Variables/#variable-types for info about colors
         col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
@@ -56,12 +57,12 @@
     
     # https://wiki.hyprland.org/Configuring/Variables/#decoration
     decoration {
-        rounding = 10
+        rounding = 4
         rounding_power = 2
     
         # Change transparency of focused and unfocused windows
-        active_opacity = 0.9
-        inactive_opacity = 0.6
+        active_opacity = 0.85
+        inactive_opacity = 0.7
     
         shadow {
             enabled = true
@@ -263,5 +264,108 @@
     windowrule = nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
     '';
     home.stateVersion = "25.05"; 
+
+    programs.waybar = {
+      enable = true;
+      package = pkgs.waybar;
+      systemd.enable = false;
+  
+      # Hyprland-Module nutzen:
+      settings = {
+        mainBar = {
+          layer = "top";
+          position = "top";
+          height = 15;
+  
+          modules-left   = [ "hyprland/workspaces" "hyprland/window" ];
+          modules-center = [ "clock" ];
+          modules-right  = [ "pulseaudio" "network" "battery" "tray" ];
+  
+          clock = {
+            format = "{:%H:%M}";
+            tooltip-format = "{:%A, %d.%m.%Y}";
+          };
+  
+          pulseaudio = { format = "{volume}% "; on-click = "pavucontrol"; };
+  
+          network = {
+            format-wifi = "  {essid} {signalStrength}%";
+            format-ethernet = "  {ipaddr}";
+            format-disconnected = "  offline";
+            tooltip = true;
+          };
+  
+          battery = {
+            format = "{capacity}% {icon}";
+            format-icons = [ "" "" "" "" "" ];
+            states = { warning = 20; critical = 10; };
+          };
+  
+          tray = { spacing = 6; icon-size = 14; };  # <- icon-size hinzufügen, spacing etwas runter
+        };
+      };
+
+    style = ''
+      /* globale Mindesthöhe killen */
+      * { min-height: 0; }
+      
+      /* Waybar-Hülle ohne eigene Mindesthöhe */
+      window#waybar { border: none; box-shadow: none; }
+      
+      /* Workspaces-Buttons klein halten (GTK-Themes setzen oft 36px) */
+      #workspaces button {
+        min-height: 0;
+        padding: 0 6px;
+        margin: 0 3px;
+      }
+      
+      /* Module kompakt */
+      #clock, #battery, #pulseaudio, #network, #tray { padding: 0 6px; }
+      window#waybar { background: rgba(20,20,24,.0); color: #e6e6e6; } 
+      #workspaces button.focused { background: #444; } 
+      #clock,#battery,#pulseaudio,#network,#tray { padding: 0 10px; } 
+      #battery.warning { color: #ffcc00; } 
+      #battery.critical { color: #ff5555; } 
+      window#waybar { border: none; }
+
+
+      * { font-family: "JetBrainsMono Nerd Font","FiraCode Nerd Font",monospace; font-size: 8pt; }
+      window#waybar {
+        border: none;
+      }
+      #network       { background: rgba(20,20,74,.0); color: #e6e6e6; }   /* grünlich für WLAN/LAN */
+      #pulseaudio    { background: rgba(20,20,74,.0); color: #e6e6e6; }   /* bläulich für Audio */
+      #battery       { background: rgba(20,20,74,.0); color: #e6e6e6; }   /* amber für Akku */
+      #tray          { background: rgba(20,20,74,.0); color: #e6e6e6; }   /* helles Blau für Tray */
+      .modules-center {
+        background: rgba(20,20,74,.7);
+        border-bottom-left-radius: 36px;
+        border-bottom-right-radius: 36px;
+	border-right: 1px solid rgba(51, 204, 255, 0.93);
+	border-left: 1px solid rgba(51, 204, 255, 0.93);
+	border-bottom: 1px solid rgba(51, 204, 255, 0.93);
+        border-top: none;
+	padding: 2px 16px 4px;
+      }
+      .modules-right {
+        background: rgba(20,20,74,.7);
+        border-bottom-left-radius: 36px;
+	border-left: 1px solid rgba(51, 204, 255, 0.93);
+	border-bottom: 1px solid rgba(51, 204, 255, 0.93);
+        border-right: none;
+        border-top: none;
+        padding: 2px 16px 4px;
+      }
+      .modules-left {
+        background: rgba(20,20,74,.7);
+        border-bottom-right-radius: 36px;
+	border-right: 1px solid rgba(51, 204, 255, 0.93);
+	border-bottom: 1px solid rgba(51, 204, 255, 0.93);
+        border-left: none;
+        border-top: none;
+        padding: 2px 16px 4px;
+      }
+    '';
+  };
   };
 }
