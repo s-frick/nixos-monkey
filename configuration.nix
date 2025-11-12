@@ -10,6 +10,11 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  nix = {
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+    };
+  };
   networking.hostName = "nixos"; 
   networking.networkmanager.enable = true;
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -59,7 +64,6 @@
     description = "sebastian";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-	neovim
     ];
     shell = pkgs.zsh;
   };
