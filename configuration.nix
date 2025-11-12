@@ -68,8 +68,6 @@
     shell = pkgs.zsh;
   };
 
-  programs.firefox.enable = true;
-
   nixpkgs.config.allowUnfree = true;
 
   fonts = {
@@ -82,6 +80,8 @@
   };
 
   environment.systemPackages = with pkgs; [
+    coreutils-full
+    tree
     git
     lazygit
     tmux
