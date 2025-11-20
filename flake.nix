@@ -26,16 +26,16 @@
       system = system;
       modules = [
         ./configuration.nix
-	inputs.mangowc.nixosModules.mango
+	      inputs.mangowc.nixosModules.mango
         inputs.home-manager.nixosModules.default
 
         home-manager.nixosModules.home-manager
         {
-	  home-manager.useGlobalPkgs = true; # teilt pkgs mit NixOS
-	  home-manager.useUserPackages = true;
-	  #home-manager.users.sebi = import ./home/sebi.nix; # dein HM-User
-	  home-manager.users.sebi = { pkgs, ... }: {
-	    xdg.configFile."mango/config.jsonc".text = ''
+	        home-manager.useGlobalPkgs = true; # teilt pkgs mit NixOS
+	        home-manager.useUserPackages = true;
+	        #home-manager.users.sebi = import ./home/sebi.nix; # dein HM-User
+	        home-manager.users.sebi = { pkgs, ... }: {
+	          xdg.configFile."mango/config.conf".text = ''
                   # Window effect
                   blur=0
                   blur_layer=0
@@ -91,7 +91,7 @@
                   scroller_focus_center=0
                   scroller_prefer_center=0
                   edge_scroller_pointer_focus=1
-                  scroller_default_proportion_single=1.0
+                  scroller_default_proportion_single=0.66
                   scroller_proportion_preset=0.5,0.8,1.0
 
                   # Master-Stack Layout Setting
@@ -125,7 +125,7 @@
                   repeat_rate=25
                   repeat_delay=600
                   numlockon=0
-                  xkb_rules_layout=us,ara
+                  xkb_rules_layout=us,de
                   xkb_rules_options=grp:win_space_toggle
 
                   # Trackpad
@@ -168,10 +168,11 @@
                   tagrule=id:3,layout_name:scroller
                   tagrule=id:4,layout_name:scroller
                   tagrule=id:5,layout_name:scroller
-                  tagrule=id:6,layout_name:scroller
-                  tagrule=id:7,layout_name:scroller
-                  tagrule=id:8,layout_name:scroller
-                  tagrule=id:9,layout_name:scroller
+
+                  tagrule=id:6,monitor_name:DVI-D-1,layout_name:tile
+                  tagrule=id:7,monitor_name:DVI-D-1,layout_name:tile
+                  tagrule=id:8,monitor_name:DVI-D-1,layout_name:tile
+                  tagrule=id:9,monitor_name:DVI-D-1,layout_name:tile
 
                   # Key Bindings
                   # key name refer to `xev` or `wev` command output,
@@ -183,6 +184,12 @@
                   # menu and terminal
                   bind=SUPER,Return,spawn,kitty
                   bind=SUPER+SHIFT,f,spawn,brave
+
+                  # monitor switch
+                  bind=alt+shift,h,focusmon,left
+                  bind=alt+shift,l,focusmon,right
+                  bind=SUPER+Alt,h,tagmon,left
+                  bind=SUPER+Alt,l,tagmon,right
 
                   # exit
                   bind=SUPER+SHIFT,e,quit
@@ -278,11 +285,12 @@
                   
                   # Exec commands
                   # exec-once=swaybg -i /home/mina/Pictures/wallpaper.jpg
-	    '';
-	    imports = [ 
-	      ./home/sebi.nix 
-	      ./hosts/common/nvim
-	    ];
+	    
+	          '';
+	          imports = [ 
+	            ./home/sebi.nix 
+	            ./hosts/common/nvim
+	          ];
           };
         }
       ];
