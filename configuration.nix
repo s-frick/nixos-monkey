@@ -79,7 +79,17 @@
     ];
   };
 
+  programs.mango.enable = true;
+
   environment.systemPackages = with pkgs; [
+    # mango
+    foot
+    wmenu
+    wl-clipboard
+    grim
+    slurp
+    swaybg
+
     coreutils-full
     tree
     git
@@ -88,12 +98,7 @@
     vim 
     wget
     kitty
-    wofi
-    waybar
-    hyprpaper
     brave
-    adwaita-icon-theme
-    gnome-themes-extra    # enthält Adwaita-Dark und HighContrast
   ]; 
     # systemweit dunkles GTK-Schema
   environment.variables = {

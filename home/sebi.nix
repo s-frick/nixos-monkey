@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 {
 
+  home.username = "sebi";
+  home.homeDirectory = "/home/sebi";
+  home.stateVersion = "25.05";
+
   programs.zsh = {
     enable = true;
 
