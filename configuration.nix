@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports =
@@ -56,15 +56,43 @@
     #jack.enable = true;
   };
 
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gtk ];
+    xdgOpenUsePortal = true;
+    wlr.enable = true;
+    wlr.settings = {
+      screencast = {
+        output_name = "HDMI-A-1";
+        max_fps = 30;
+        exec_before = "disable_notifications.sh";
+        exec_after = "enable_notifications.sh";
+        chooser_type = "simple";
+        chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+      };
+    }
+    ;
+    
+    config = {
+      common = {
+        "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];
+      };
+    };
+  };
   programs.zsh.enable = true;
 
   # Define a user account. Set a password with ‘passwd’.
   users.users.sebi = {
     isNormalUser = true;
     description = "sebastian";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
+    extraGroups = [ 
+      "networkmanager" 
+      "wheel"
+      "audio"
+      "video"
     ];
+    # packages = with pkgs; [
+    # ];
     shell = pkgs.zsh;
   };
 
@@ -86,6 +114,19 @@
     foot
     wmenu
     wl-clipboard
+    wl-clip-persist
+    sway-audio-idle-inhibit
+    swayidle
+    wlogout
+    sox
+    wlr-randr
+    swaybg
+    pipewire
+    wireplumber
+    xdg-desktop-portal
+    xdg-desktop-portal-gtk
+    xdg-desktop-portal-wlr
+    rofi
     grim
     slurp
     swaybg
@@ -99,6 +140,10 @@
     wget
     kitty
     brave
+
+    # Audio/video
+    pavucontrol
+    playerctl
   ]; 
     # systemweit dunkles GTK-Schema
   environment.variables = {

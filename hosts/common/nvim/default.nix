@@ -13,6 +13,7 @@
       maven
       lua-language-server
       nixd
+      nixfmt
       ripgrep
       fd
       stylua
