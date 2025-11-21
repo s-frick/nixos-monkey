@@ -3,7 +3,7 @@
                     enable = true;
                     settings = ''
                       # Window effect
-                      blur=0
+                      blur=1
                       blur_layer=0
                       blur_optimized=1
                       blur_params_num_passes = 2
@@ -24,8 +24,8 @@
     
                       border_radius=6
                       no_radius_when_single=0
-                      focused_opacity=1.0
-                      unfocused_opacity=1.0
+                      focused_opacity=0.92
+                      unfocused_opacity=0.7
     
                       # Animation Configuration(support type:zoom,slide)
                       # tag_animation_direction: 0-horizontal,1-vertical
@@ -261,6 +261,7 @@
                     autostart_sh = ''
                       wlr-randr --output HDMI-A-1 --output DVI-D-1 --right-of HDMI-A-1 &
                       waybar &
+                      swaybg -i ~/Downloads/nix-wallpaper-binary-black.png -m fill &
                     '';
                   };
                 }

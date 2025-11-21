@@ -25,6 +25,7 @@
     # optional: zusätzliche RC-Dateien / Einstellungen
     initContent = ''
       # hier kannst du alles reinschreiben, was sonst in .zshrc stehen würde
+      source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
       export EDITOR="nvim"
       bindkey -v
     '';
