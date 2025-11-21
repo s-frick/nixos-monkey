@@ -1,21 +1,17 @@
-{ pkgs, ... }:
+{ pkgs, pkgs-unstable, ... }:
 
 {
-  imports =
-    [ 
-      ./hardware-configuration.nix
-    ];
+  imports = [ ./hardware-configuration.nix ];
+
+  nixpkgs.overlays =
+    [ (final: prev: { quickshell = pkgs-unstable.quickshell; }) ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  nix = {
-    settings = {
-      experimental-features = [ "nix-command" "flakes" ];
-    };
-  };
-  networking.hostName = "nixos"; 
+  nix = { settings = { experimental-features = [ "nix-command" "flakes" ]; }; };
+  networking.hostName = "nixos";
   networking.networkmanager.enable = true;
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -34,6 +30,11 @@
     LC_TIME = "de_DE.UTF-8";
   };
 
+  environment.variables = {
+    XDG_CURRENT_DESKTOP = "wlroots";
+    XDG_SESSION_DESKTOP = "wlroots";
+    GTK_THEME = "Adwaita-dark";
+  };
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -56,6 +57,16 @@
     #jack.enable = true;
   };
 
+  # services.greetd = {
+  #   enable = true;
+  #   settings = {
+  #     default_session = {
+  #       command = "${pkgs.mangowc}/bin/mango";
+  #       user = "sebi";
+  #     };
+  #   };
+  # };
+
   xdg.portal = {
     enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gtk ];
@@ -70,13 +81,10 @@
         chooser_type = "simple";
         chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
       };
-    }
-    ;
-    
+    };
+
     config = {
-      common = {
-        "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];
-      };
+      common = { "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ]; };
     };
   };
   programs.zsh.enable = true;
@@ -85,12 +93,7 @@
   users.users.sebi = {
     isNormalUser = true;
     description = "sebastian";
-    extraGroups = [ 
-      "networkmanager" 
-      "wheel"
-      "audio"
-      "video"
-    ];
+    extraGroups = [ "networkmanager" "wheel" "audio" "video" ];
     # packages = with pkgs; [
     # ];
     shell = pkgs.zsh;
@@ -101,42 +104,32 @@
   fonts = {
     enableDefaultPackages = true;
 
-    packages = with pkgs; [
-      nerd-fonts.jetbrains-mono
-      nerd-fonts.fira-code
-    ];
+    packages = with pkgs; [ nerd-fonts.jetbrains-mono nerd-fonts.fira-code ];
   };
 
   programs.mango.enable = true;
 
   environment.systemPackages = with pkgs; [
+    adwaita-qt
+    quickshell
     # mango
     foot
-    wmenu
-    wl-clipboard
-    wl-clip-persist
-    sway-audio-idle-inhibit
-    swayidle
-    wlogout
     sox
     wlr-randr
-    swaybg
     pipewire
     wireplumber
     xdg-desktop-portal
     xdg-desktop-portal-gtk
     xdg-desktop-portal-wlr
-    rofi
     grim
     slurp
-    swaybg
 
     coreutils-full
     tree
     git
     lazygit
     tmux
-    vim 
+    vim
     wget
     kitty
     brave
@@ -144,11 +137,7 @@
     # Audio/video
     pavucontrol
     playerctl
-  ]; 
-    # systemweit dunkles GTK-Schema
-  environment.variables = {
-    GTK_THEME = "Adwaita:dark";   # oder "Catppuccin-Mocha-Standard-Blue-Dark" falls installiert
-  };
+  ];
 
-  system.stateVersion = "25.05"; 
+  system.stateVersion = "25.05";
 }

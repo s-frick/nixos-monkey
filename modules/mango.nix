@@ -13,7 +13,7 @@
                       blur_params_contrast = 0.9
                       blur_params_saturation = 1.2
     
-                      shadows = 0
+                      shadows = 1
                       layer_shadows = 0
                       shadow_only_floating = 1
                       shadows_size = 10
@@ -22,7 +22,7 @@
                       shadows_position_y = 0
                       shadowscolor= 0x0000ff
     
-                      border_radius=6
+                      border_radius=16
                       no_radius_when_single=0
                       focused_opacity=0.92
                       unfocused_opacity=0.7
@@ -53,16 +53,16 @@
     
                       # Scroller Layout Setting
                       scroller_structs=20
-                      scroller_default_proportion=0.8
+                      scroller_default_proportion=0.66
                       scroller_focus_center=0
                       scroller_prefer_center=0
                       edge_scroller_pointer_focus=1
                       scroller_default_proportion_single=0.66
-                      scroller_proportion_preset=0.5,0.8,1.0
+                      scroller_proportion_preset=0.33,0.5,0.66,0.8,1.0
     
                       # Master-Stack Layout Setting
                       new_is_master=1
-                      default_mfact=0.55
+                      default_mfact=0.65
                       default_nmaster=1
                       smartgaps=0
     
@@ -129,8 +129,8 @@
     
                       # layout support:
                       # tile,scroller,grid,deck,monocle,center_tile,vertical_tile,vertical_scroller
-                      tagrule=id:1,layout_name:scroller
-                      tagrule=id:2,layout_name:scroller
+                      tagrule=id:1,layout_name:center_tile
+                      tagrule=id:2,layout_name:monocle
                       tagrule=id:3,layout_name:scroller
                       tagrule=id:4,layout_name:scroller
                       tagrule=id:5,layout_name:scroller
@@ -150,7 +150,7 @@
                       # menu and terminal
                       bind=SUPER,Return,spawn,kitty
                       bind=SUPER+SHIFT,f,spawn,brave
-                      bind=SUPER,d,spawn,brave
+                      bind=SUPER,d,spawn,dms ipc call spotlight open
     
                       # monitor switch
                       bind=alt+shift,h,focusmon,left
@@ -176,7 +176,7 @@
                       bind=SUPER+SHIFT,j,exchange_client,down
     
                       # switch window status
-                      bind=SUPER,g,toggleglobal
+                      # bind=SUPER,g,toggleglobal
                       bind=SUPER,o,toggleoverview
                       bind=SUPER,m,togglefloating
                       bind=SUPER+SHIFT,m,togglemaximizescreen
@@ -259,9 +259,18 @@
                       # exec_always=waybar &
                     '';
                     autostart_sh = ''
+                      set -e
+
+                      # wichtige envs an systemd/dbus durchreichen (hilft bei App-Autostart)
+                      dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=wlroots
+                      
+                      # optional: kleines Delay damit Mango fertig ist
+                      sleep 0.5
+                      
                       wlr-randr --output HDMI-A-1 --output DVI-D-1 --right-of HDMI-A-1 &
-                      waybar &
-                      swaybg -i ~/Downloads/nix-wallpaper-binary-black.png -m fill &
+                      
+                      # DankMaterialShell starten
+                      dms run -d
                     '';
                   };
                 }
