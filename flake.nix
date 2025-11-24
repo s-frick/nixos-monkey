@@ -39,6 +39,7 @@
         modules = [
           ./configuration.nix
           inputs.mangowc.nixosModules.mango
+          inputs.dankMaterialShell.nixosModules.greeter
 
           home-manager.nixosModules.home-manager
           {
@@ -50,6 +51,7 @@
                 ./modules/mango.nix
                 # ./modules/quickshell-hm.nix
                 ./home/sebi.nix
+                ./home/ranger
                 ./hosts/common/nvim
                 inputs.mangowc.hmModules.mango
                 inputs.dankMaterialShell.homeModules.dankMaterialShell.default

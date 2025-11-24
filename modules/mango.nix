@@ -151,6 +151,7 @@
                       bind=SUPER,Return,spawn,kitty
                       bind=SUPER+SHIFT,f,spawn,brave
                       bind=SUPER,d,spawn,dms ipc call spotlight open
+                      bind=SUPER,s,spawn,./scripts/take_screenshot
     
                       # monitor switch
                       bind=alt+shift,h,focusmon,left
@@ -221,8 +222,8 @@
                       bind=SUPER+SHIFT,9,tag,9,0
     
                       # gaps
-                      bind=SUPER+SHIFT,x,incgaps,1
-                      bind=SUPER+SHIFT,z,incgaps,-1
+                      bind=SUPER+SHIFT,x,incgaps,5
+                      bind=SUPER+SHIFT,z,incgaps,-5
                       bind=SUPER+SHIFT,r,togglegaps
     
                       # Mouse Button Bindings
@@ -234,29 +235,16 @@
                       mousebind=NONE,btn_left,toggleoverview,1
                       mousebind=NONE,btn_right,killclient,0
     
-                      # Axis Bindings
-                      axisbind=SUPER,UP,viewtoleft_have_client
-                      axisbind=SUPER,DOWN,viewtoright_have_client
-    
-                      # layer rule
-                      layerrule=animation_type_open:zoom,layer_name:rofi
-                      layerrule=animation_type_close:zoom,layer_name:rofi
-    
                       # Environment variables
                       env=XCURSOR_SIZE,24
-                      env=XCURSOR_THEME,catppuccin-mocha-dark-cursors
-                      env=WAYLAND_DISPLAY
-                      env=XDG_CURRENT_DESKTOP
+                      env=XCURSOR_THEME,Adwaita-dark
+                      env=WAYLAND_DISPLAY,wlroots
+                      env=XDG_CURRENT_DESKTOP,wlroots
                       
                       # Additional environment variables for theming
-                      env=GTK_THEME,Catppuccin-Mocha-Standard-Blue-Dark
-                      env=ICON_THEME,catppuccin-mocha-blue-standard
+                      env=GTK_THEME,Adwaita-dark
+                      env=ICON_THEME,Adwaita-dark
 
-                      exec-once=dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-                      # Exec commands
-                      # exec-once=swaybg -i /home/mina/Pictures/wallpaper.jpg
-                      # exec_always=wlr-randr --output HDMI-A-1 --output DVI-D-1 --right-of HDMI-A-1
-                      # exec_always=waybar &
                     '';
                     autostart_sh = ''
                       set -e

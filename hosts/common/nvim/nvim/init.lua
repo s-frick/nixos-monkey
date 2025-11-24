@@ -18,8 +18,9 @@ vim.opt.swapfile = false -- Don't create swap files
 vim.opt.undofile = true -- Persistent undo
 vim.opt.undodir = vim.fn.expand("~/.vim/undodir") -- Undo directory
 vim.opt.updatetime = 300 -- Faster completion
-vim.opt.timeoutlen = 500 -- Key timeout duration
+vim.opt.timeoutlen = 300 -- Key timeout duration
 vim.opt.ttimeoutlen = 0 -- Key code timeout
+vim.opt.ttimeout = true
 vim.opt.autoread = true -- Auto reload files changed outside vim
 vim.opt.autowrite = false -- Don't auto save
 
@@ -28,6 +29,10 @@ vim.cmd.colorscheme("catppuccin")
 
 -- WhichKey
 require("which-key").setup({})
+vim.keymap.set("n", "<leader>-", ":vsplit <CR>", { desc = "Vertical Split" })
+vim.keymap.set("n", "<leader>\\", ":split <CR>", { desc = "Horizontal Split" })
+vim.keymap.set("n", "<leader>q", ":q <CR>", { desc = "Close Buffer" })
+vim.keymap.set("n", "<leader>qq", ":qa <CR>", { desc = "Close Buffer" })
 
 -- Telescope
 local tb = require("telescope.builtin")
@@ -165,8 +170,8 @@ local on_attach = function(client, bufnr)
 	map("n", "gd", vim.lsp.buf.definition, "Go to definition")
 	map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
 	map("n", "gi", has_telescope and tb.lsp_implementations or vim.lsp.buf.implementation, "Go to implementation")
-	-- map("n", "gr", has_telescope and tb.lsp_references      or vim.lsp.buf.references,     "References")
-	map("n", "gr", vim.lsp.buf.references, "References")
+	map("n", "gr", has_telescope and tb.lsp_references      or vim.lsp.buf.references,     "References")
+  -- map("n", "gr", vim.lsp.buf.references, "References")
 	map("n", "K", vim.lsp.buf.hover, "Hover docs")
 	map("n", "<C-k>", vim.lsp.buf.signature_help, "Signature help")
 
@@ -183,7 +188,7 @@ local on_attach = function(client, bufnr)
 	map("n", "[d", vim.diagnostic.goto_prev, "Prev diagnostic")
 	map("n", "]d", vim.diagnostic.goto_next, "Next diagnostic")
 	map("n", "<leader>e", vim.diagnostic.open_float, "Line diagnostics")
-	map("n", "<leader>q", vim.diagnostic.setloclist, "Diagnostics → loclist")
+	map("n", "<leader>dl", vim.diagnostic.setloclist, "Diagnostics → loclist")
 
 	-- Symbole
 	map("n", "<leader>ls", has_telescope and tb.lsp_document_symbols or vim.lsp.buf.document_symbol, "Document symbols")
@@ -213,10 +218,11 @@ end
 -- Which-Key Labels (optional – du hast which-key)
 pcall(function()
 	local wk = require("which-key")
-	wk.register({
-		["<leader>l"] = { name = "+LSP" },
-		["<leader>t"] = { name = "+Toggle" },
-	}, { mode = "n" })
+	wk.add({
+		mode = { "n" },
+		{ "<leader>l", group = "LSP" },
+		{ "<leader>t", group = "Toggle" },
+	})
 end)
 
 local lspconfig = require("lspconfig")
@@ -230,7 +236,7 @@ lspconfig.lua_ls.setup({
 	settings = {
 		Lua = {
 			diagnostics = { globals = { "vim" } },
-			workspace = { checkThirdParty = false },
+			workspace = { checkThirdParty = true },
 			telemetry = { enable = false },
 		},
 	},

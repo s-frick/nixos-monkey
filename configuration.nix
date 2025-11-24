@@ -3,9 +3,6 @@
 {
   imports = [ ./hardware-configuration.nix ];
 
-  nixpkgs.overlays =
-    [ (final: prev: { quickshell = pkgs-unstable.quickshell; }) ];
-
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -13,7 +10,6 @@
   nix = { settings = { experimental-features = [ "nix-command" "flakes" ]; }; };
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   time.timeZone = "Europe/Berlin";
 
@@ -28,12 +24,6 @@
     LC_PAPER = "de_DE.UTF-8";
     LC_TELEPHONE = "de_DE.UTF-8";
     LC_TIME = "de_DE.UTF-8";
-  };
-
-  environment.variables = {
-    XDG_CURRENT_DESKTOP = "wlroots";
-    XDG_SESSION_DESKTOP = "wlroots";
-    GTK_THEME = "Adwaita-dark";
   };
 
   # Configure keymap in X11
@@ -57,16 +47,6 @@
     #jack.enable = true;
   };
 
-  # services.greetd = {
-  #   enable = true;
-  #   settings = {
-  #     default_session = {
-  #       command = "${pkgs.mangowc}/bin/mango";
-  #       user = "sebi";
-  #     };
-  #   };
-  # };
-
   xdg.portal = {
     enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gtk ];
@@ -87,7 +67,6 @@
       common = { "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ]; };
     };
   };
-  programs.zsh.enable = true;
 
   # Define a user account. Set a password with ‘passwd’.
   users.users.sebi = {
@@ -99,7 +78,6 @@
     shell = pkgs.zsh;
   };
 
-  nixpkgs.config.allowUnfree = true;
 
   fonts = {
     enableDefaultPackages = true;
@@ -108,11 +86,14 @@
   };
 
   programs.mango.enable = true;
+  programs.zsh.enable = true;
+  programs.dconf.enable = true;
 
+  nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
     adwaita-qt
+    adwaita-icon-theme
     quickshell
-    # mango
     foot
     sox
     wlr-randr
@@ -125,6 +106,7 @@
     slurp
 
     coreutils-full
+    gnumake
     tree
     git
     lazygit
@@ -137,7 +119,22 @@
     # Audio/video
     pavucontrol
     playerctl
+    obs-studio
+
+    gimp3
   ];
+
+  programs.obs-studio = {
+    enable = true;
+    enableVirtualCamera = true;
+    plugins = with pkgs; [ 
+      obs-studio-plugins.wlrobs
+      obs-studio-plugins.droidcam-obs
+    ];
+  };
+  nixpkgs.overlays =
+    [ (final: prev: { quickshell = pkgs-unstable.quickshell; }) ];
+
 
   system.stateVersion = "25.05";
 }

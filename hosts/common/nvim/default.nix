@@ -51,6 +51,9 @@
         cmp_luasnip
         friendly-snippets
         nvim-FeMaco-lua
+        mini-icons
+        nvim-web-devicons
+        vim-tmux-navigator
   
         # Syntax/Parsing
         (nvim-treesitter.withPlugins (p: [
