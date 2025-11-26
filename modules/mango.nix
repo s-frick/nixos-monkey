@@ -1,5 +1,10 @@
-{ ... }: 
+{ inputs, ... }: 
 {
+  imports = [
+    inputs.mangowc.nixosModules.mango
+    inputs.dankMaterialShell.nixosModules.greeter
+  ];
+
   wayland.windowManager.mango = {
     enable = true;
     settings = ''

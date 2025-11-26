@@ -1,5 +1,6 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, config, inputs, ... }:
 {
+  inputs.home-manager = {
     home.packages = lib.mkAfter (with pkgs; [
       tmux
 
@@ -80,4 +81,6 @@
     };
 
     xdg.configFile."nvim".source = ./nvim;
+  };
 }
+

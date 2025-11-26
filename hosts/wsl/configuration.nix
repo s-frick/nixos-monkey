@@ -1,8 +1,7 @@
 { config, pkgs, lib, inputs, pkgs-unstable, ... }:
 {
   imports = [
-    ./nvim
-    ../../home/ranger
+    ../common
     <nixos-wsl/modules>
 
     inputs.mangowc.nixosModules.mango
