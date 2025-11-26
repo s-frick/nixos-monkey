@@ -33,33 +33,39 @@
       pkgs = nixpkgs.legacyPackages.${system};
       pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
     in {
-      nixosConfigurations.fuji = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit inputs pkgs-unstable; };
-        system = system;
-        modules = [
-          ./configuration.nix
-          inputs.mangowc.nixosModules.mango
-          inputs.dankMaterialShell.nixosModules.greeter
+      nixosConfigurations = {
+        fuji = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs pkgs-unstable; };
+          system = system;
+          modules = [
+            ./hosts/fuji/configuration.nix
+            inputs.mangowc.nixosModules.mango
+            inputs.dankMaterialShell.nixosModules.greeter
 
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true; # teilt pkgs mit NixOS
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable; };
-            home-manager.users.sebi = { ... }: {
-              imports = [
-                ./modules/mango.nix
-                # ./modules/quickshell-hm.nix
-                ./home/sebi.nix
-                ./home/ranger
-                ./hosts/common/nvim
-                inputs.mangowc.hmModules.mango
-                inputs.dankMaterialShell.homeModules.dankMaterialShell.default
-              ];
-              programs.quickshell.enable = true;
-            };
-          }
-        ];
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true; # teilt pkgs mit NixOS
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable; };
+              home-manager.users.sebi = import ./hosts/common/home-sebi.nix;
+            }
+          ];
+        };
+        wsl = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs pkgs-unstable; };
+          system = system;
+          modules = [
+            ./hosts/wsl/configuration.nix
+
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true; # teilt pkgs mit NixOS
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable; };
+              home-manager.users.sebi = import ./hosts/common/home-sebi.nix;
+            }
+          ];
+        };
       };
     };
 }
