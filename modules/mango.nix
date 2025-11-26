@@ -24,8 +24,8 @@
     
                       border_radius=16
                       no_radius_when_single=0
-                      focused_opacity=0.92
-                      unfocused_opacity=0.7
+                      focused_opacity=0.96
+                      unfocused_opacity=0.85
     
                       # Animation Configuration(support type:zoom,slide)
                       # tag_animation_direction: 0-horizontal,1-vertical
@@ -39,7 +39,7 @@
                       zoom_initial_ratio=0.3
                       zoom_end_ratio=0.8
                       fadein_begin_opacity=0.5
-                      fadeout_begin_opacity=0.8
+                      fadeout_begin_opacity=0.85
                       animation_duration_move=500
                       animation_duration_open=400
                       animation_duration_tag=350
@@ -129,8 +129,8 @@
     
                       # layout support:
                       # tile,scroller,grid,deck,monocle,center_tile,vertical_tile,vertical_scroller
-                      tagrule=id:1,layout_name:center_tile
-                      tagrule=id:2,layout_name:monocle
+                      tagrule=id:1,layout_name:vertical_scroller
+                      tagrule=id:2,layout_name:scroller
                       tagrule=id:3,layout_name:scroller
                       tagrule=id:4,layout_name:scroller
                       tagrule=id:5,layout_name:scroller
@@ -151,7 +151,7 @@
                       bind=SUPER,Return,spawn,kitty
                       bind=SUPER+SHIFT,f,spawn,brave
                       bind=SUPER,d,spawn,dms ipc call spotlight open
-                      bind=SUPER,s,spawn,./scripts/take_screenshot
+                      bind=SUPER+SHIFT,s,spawn,./scripts/take_screenshot
     
                       # monitor switch
                       bind=alt+shift,h,focusmon,left
@@ -193,6 +193,10 @@
     
                       # switch layout
                       bind=SUPER,g,switch_layout
+                      bind=SUPER,s,setlayout,scroller
+                      bind=SUPER,v,setlayout,vertical_scroller
+                      bind=SUPER,c,setlayout,center_tile
+                      bind=SUPER,t,setlayout,tile
     
                       # tag switch
                       bind=SUPER,Left,viewtoleft,0

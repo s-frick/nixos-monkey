@@ -24,22 +24,12 @@ vim.opt.ttimeout = true
 vim.opt.autoread = true -- Auto reload files changed outside vim
 vim.opt.autowrite = false -- Don't auto save
 
+local keymap = require('keymaps')
+keymap.setup()
+
 -- Theme
 vim.cmd.colorscheme("catppuccin")
 
--- WhichKey
-require("which-key").setup({})
-vim.keymap.set("n", "<leader>-", ":vsplit <CR>", { desc = "Vertical Split" })
-vim.keymap.set("n", "<leader>\\", ":split <CR>", { desc = "Horizontal Split" })
-vim.keymap.set("n", "<leader>q", ":q <CR>", { desc = "Close Buffer" })
-vim.keymap.set("n", "<leader>qq", ":qa <CR>", { desc = "Close Buffer" })
-
--- Telescope
-local tb = require("telescope.builtin")
-vim.keymap.set("n", "<leader>ff", tb.find_files, { desc = "Find files" })
-vim.keymap.set("n", "<leader>fg", tb.live_grep, { desc = "Live grep" })
-vim.keymap.set("n", "<leader>fb", tb.buffers, { desc = "Buffers" })
-vim.keymap.set("n", "<leader>fh", tb.help_tags, { desc = "Help tags" })
 
 -- Treesitter: Parser in ein beschreibbares Verzeichnis legen (nicht im Nix-Store)
 local parser_path = vim.fn.stdpath("data") .. "/treesitter-parsers"
@@ -55,6 +45,9 @@ require("nvim-treesitter.configs").setup({
 	auto_install = false, -- keine Auto-Downloads (würden sonst wieder in den Store wollen)
 	highlight = { enable = true },
 	indent = { enable = true },
+  modules = {},
+  ignore_install = {},
+  sync_install = false
 })
 
 -- Lualine
@@ -71,6 +64,11 @@ local luasnip = require("luasnip")
 require("luasnip.loaders.from_vscode").lazy_load()
 
 cmp.setup({
+  preselect = cmp.PreselectMode.Item,
+  completion = {
+    completeopt = "menu,menuone",
+    autocomplete = { require("cmp.types").cmp.TriggerEvent.TextChanged },
+  },
 	snippet = {
 		expand = function(args)
 			luasnip.lsp_expand(args.body)
@@ -78,25 +76,25 @@ cmp.setup({
 	},
 	mapping = cmp.mapping.preset.insert({
 		["<C-Space>"] = cmp.mapping.complete(),
-		["<CR>"] = cmp.mapping.confirm({ select = true }),
+
+    -- Navigation
+    ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+    ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+
+		["<C-y>"] = cmp.mapping.confirm({ select = false }),
+    ["<CR>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.abort()
+      end
+      fallback()
+    end, { "i", "s" }),
 		["<Tab>"] = cmp.mapping(function(fallback)
-			if cmp.visible() then
-				cmp.select_next_item()
-			elseif luasnip.expand_or_jumpable() then
-				luasnip.expand_or_jump()
-			else
-				fallback()
-			end
-		end, { "i", "s" }),
-		["<S-Tab>"] = cmp.mapping(function(fallback)
-			if cmp.visible() then
-				cmp.select_prev_item()
-			elseif luasnip.jumpable(-1) then
-				luasnip.jump(-1)
-			else
-				fallback()
-			end
-		end, { "i", "s" }),
+      if cmp.visible() then
+        cmp.abort()
+      end
+      fallback()
+    end, { "i", "s" }),
+		["<S-Tab>"] = function() end,
 	}),
 	sources = cmp.config.sources({
 		{ name = "nvim_lsp" },
@@ -142,89 +140,6 @@ for type, icon in pairs(signs) do
 	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 end
 
--- kleiner Helper für sichere Telescope-Nutzung
-local has_telescope, tb = pcall(require, "telescope.builtin")
-
--- Toggle für Inlay-Hints (Neovim 0.10+)
-local function toggle_inlay_hints(bufnr)
-	local ih = vim.lsp.inlay_hint
-	if type(ih) == "table" and ih.is_enabled then
-		ih.enable(not ih.is_enabled({ bufnr = bufnr }), { bufnr = bufnr })
-	end
-end
-
--- formatiert mit LSP, wenn unterstützt (sonst still nichts)
-local function lsp_format(bufnr)
-	if vim.lsp.buf.format then
-		vim.lsp.buf.format({ async = true })
-	end
-end
-
--- zentrales on_attach für alle Server
-local on_attach = function(client, bufnr)
-	local map = function(mode, lhs, rhs, desc)
-		vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, noremap = true, desc = desc })
-	end
-
-	-- Navigation
-	map("n", "gd", vim.lsp.buf.definition, "Go to definition")
-	map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
-	map("n", "gi", has_telescope and tb.lsp_implementations or vim.lsp.buf.implementation, "Go to implementation")
-	map("n", "gr", has_telescope and tb.lsp_references      or vim.lsp.buf.references,     "References")
-  -- map("n", "gr", vim.lsp.buf.references, "References")
-	map("n", "K", vim.lsp.buf.hover, "Hover docs")
-	map("n", "<C-k>", vim.lsp.buf.signature_help, "Signature help")
-
-	-- Aktionen
-	map("n", "<leader>rn", vim.lsp.buf.rename, "Rename symbol")
-	map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code action")
-
-	-- Format
-	map({ "n", "v" }, "<leader>fo", function()
-		lsp_format(bufnr)
-	end, "Format buffer")
-
-	-- Diagnostics
-	map("n", "[d", vim.diagnostic.goto_prev, "Prev diagnostic")
-	map("n", "]d", vim.diagnostic.goto_next, "Next diagnostic")
-	map("n", "<leader>e", vim.diagnostic.open_float, "Line diagnostics")
-	map("n", "<leader>dl", vim.diagnostic.setloclist, "Diagnostics → loclist")
-
-	-- Symbole
-	map("n", "<leader>ls", has_telescope and tb.lsp_document_symbols or vim.lsp.buf.document_symbol, "Document symbols")
-	map(
-		"n",
-		"<leader>lS",
-		has_telescope and tb.lsp_workspace_symbols or vim.lsp.buf.workspace_symbol,
-		"Workspace symbols"
-	)
-
-	-- Workspace-Verzeichnisse
-	map("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, "Workspace add")
-	map("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, "Workspace remove")
-	map("n", "<leader>wl", function()
-		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-	end, "Workspace list")
-
-	-- Inlay Hints togglen
-	map("n", "<leader>ti", function()
-		toggle_inlay_hints(bufnr)
-	end, "Toggle inlay hints")
-
-	-- :LspInfo schnell
-	map("n", "<leader>li", "<cmd>LspInfo<CR>", "LSP info")
-end
-
--- Which-Key Labels (optional – du hast which-key)
-pcall(function()
-	local wk = require("which-key")
-	wk.add({
-		mode = { "n" },
-		{ "<leader>l", group = "LSP" },
-		{ "<leader>t", group = "Toggle" },
-	})
-end)
-
 local lspconfig = require("lspconfig")
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 local util = lspconfig.util
@@ -232,11 +147,17 @@ local util = lspconfig.util
 -- Lua (Neovim)
 lspconfig.lua_ls.setup({
 	capabilities = capabilities,
-	on_attach = on_attach,
+	on_attach = keymap.on_attach,
 	settings = {
 		Lua = {
 			diagnostics = { globals = { "vim" } },
-			workspace = { checkThirdParty = true },
+			workspace = {
+        checkThirdParty = false,
+        library = vim.api.nvim_get_runtime_file("", true),
+      },
+      completion = {
+        callSnippet = "Replace"
+      },
 			telemetry = { enable = false },
 		},
 	},
@@ -245,7 +166,7 @@ lspconfig.lua_ls.setup({
 -- Typescript
 lspconfig.ts_ls.setup({
 	capabilities = capabilities,
-	on_attach = on_attach,
+	on_attach = keymap.on_attach,
 	cmd = { "typescript-language-server", "--stdio" },
 	root_dir = util.root_pattern("tsconfig.json", "jsconfig.json", "package.json", ".git"),
 	single_file_support = false,
@@ -330,7 +251,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- Nix
 lspconfig.nixd.setup({
 	capabilities = capabilities,
-	on_attach = on_attach,
+	on_attach = keymap.on_attach,
 })
 
 -- ======================================
@@ -344,7 +265,7 @@ os.execute("mkdir -p " .. workspace_dir)
 
 lspconfig.jdtls.setup({
 	capabilities = capabilities,
-	on_attach = on_attach,
+	on_attach = keymap.on_attach,
 	cmd = { "jdtls-lombok" },
 	root_dir = lspconfig.util.root_pattern("pom.xml", "build.gradle", ".git"),
 	settings = {
@@ -352,6 +273,7 @@ lspconfig.jdtls.setup({
 			signatureHelp = { enabled = true },
 			contentProvider = { preferred = "fernflower" },
 			completion = {
+				guessMethodArguments = false,
 				favoriteStaticMembers = {
 					"org.junit.Assert.*",
 					"org.junit.Assume.*",
@@ -390,16 +312,6 @@ lspconfig.jdtls.setup({
 			referencesCodeLens = { enabled = true },
 			references = { includeDecompiledSources = true },
 			format = { enabled = true }, -- falls Formatter-Prompts nerven
-			signatureHelp = { enabled = true },
-			completion = {
-				guessMethodArguments = false,
-				favoriteStaticMembers = {
-					"org.junit.Assert.*",
-					"org.junit.jupiter.api.Assertions.*",
-					"org.mockito.Mockito.*",
-				},
-			},
-			contentProvider = { preferred = "fernflower" }, -- Decompiler
 		},
 	},
 	init_options = {
